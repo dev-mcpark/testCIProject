@@ -26,10 +26,12 @@ workflows:
             branches:
               only:
                 - master
+                - feature/.*
       - build:
           filters:
             branches:
               only:
                 - master
+                - feature/.*
           requires:
             - build_approval
