@@ -14,3 +14,22 @@ jobs:
       - run:
           name: Print the Current Time
           command: date
+
+
+workflows:
+  version: 2
+  job-and-job:
+    jobs:   
+      - build_approval:
+          type: approval
+          filters:
+            branches:
+              only:
+                - master
+      - build:
+          filters:
+            branches:
+              only:
+                - master
+          requires:
+            - build_approval
