@@ -26,10 +26,12 @@ workflows:
             branches:
               only:
                 - master
+                - /^feature/test-.*/
       - build:
           filters:
             branches:
               only:
                 - master
+                - /^feature/test-.*/
           requires:
             - build_approval
