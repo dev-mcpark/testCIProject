@@ -14,24 +14,39 @@ jobs:
       - run:
           name: Print the Current Time
           command: date
+  test:
+    steps:
+      - run:
+          name: Testing application
+          command: echo Test Start.
+          shell: /bin/bash
+          environment:
+            FOO: bar
 
 
 workflows:
   version: 2
   job-and-job:
     jobs:   
-      - build_approval:
+      - hold:
           type: approval
           filters:
             branches:
               only:
                 - master
                 - /^feature/test-.*/
+                - /^develop/test-.*/
+                - /^hotfix/test-.*/
       - build:
           filters:
             branches:
               only:
                 - master
                 - /^feature/test-.*/
+                - /^develop/test-.*/
+                - /^hotfix/test-.*/
           requires:
-            - build_approval
+            - hold
+      - test:
+          requires:
+            -hold
