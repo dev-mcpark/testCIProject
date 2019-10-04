@@ -1,4 +1,4 @@
-version: 2
+version: 2.1
 jobs:
   build:
     docker:
@@ -15,23 +15,60 @@ jobs:
           name: Print the Current Time
           command: date
 
+  test:
+    docker:
+      - image: debian:stretch
+
+    steps:
+      - run:
+          name: Testing application
+          command: echo Test Start.
+          shell: /bin/bash
+          environment:
+            FOO: bar
+            
+  deploy:
+    docker:
+      - image: debian:stretch
+
+    steps:
+      - run: 
+          name: Deploy application
+          command: echo Deploy Application.
+
 
 workflows:
   version: 2
   job-and-job:
     jobs:   
-      - build_approval:
-          type: approval
-          filters:
-            branches:
-              only:
-                - master
-                - /^feature/test-.*/
       - build:
           filters:
             branches:
               only:
                 - master
                 - /^feature/test-.*/
+                - /^develop/test-.*/
+                - /^hotfix/test-.*/
+      - test:
           requires:
-            - build_approval
+            - build
+      - hold:
+          type: approval
+          filters:
+            branches:
+              only:
+                - master
+                - /^feature/test-.*/
+          requires:
+            - build
+            - test
+      - deploy:
+          filters:
+            branches:
+              only:
+                - master
+                - /^feature/test-.*/
+          requires:
+            - build
+            - test
+            - hold
