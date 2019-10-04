@@ -23,20 +23,17 @@ jobs:
           environment:
             FOO: bar
 
+  deploy:
+    steps:
+      - run: 
+          name: Deploy application
+          command: echo Deploy Application.
+
 
 workflows:
   version: 2
   job-and-job:
     jobs:   
-      - hold:
-          type: approval
-          filters:
-            branches:
-              only:
-                - master
-                - /^feature/test-.*/
-                - /^develop/test-.*/
-                - /^hotfix/test-.*/
       - build:
           filters:
             branches:
@@ -45,8 +42,26 @@ workflows:
                 - /^feature/test-.*/
                 - /^develop/test-.*/
                 - /^hotfix/test-.*/
-          requires:
-            - hold
       - test:
           requires:
+            - build
+      - hold:
+          type: approval
+          filters:
+            branches:
+              only:
+                - master
+                - /^feature/test-.*/
+          requires:
+            - build
+            - test
+      - deploy:
+          filters:
+            branches:
+              only:
+                - master
+                - /^feature/test-.*/
+          requires:
+            - build
+            - test
             - hold
