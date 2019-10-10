@@ -1,18 +1,22 @@
 name: production Build and Deploy
 
 on:
-  pull_request:
+  push:
     branches:
       - master
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    container: docker://python:3.6
     steps:
-    - uses: docker://python:3.6
     - uses: actions/checkout@v1
-    - name: Run a one-line script
-      run: echo Hello, world! ${{ github.event_name }} ${{ github.event.action }}
+
+    - name: install dependencies
+      run: |
+        python3 -m venv venv
+        . venv/bin/activate
+        pip install -r requirements.txt
+
     - name: Run a multi-line script
       run: |
         echo Add other actions to build,
@@ -31,13 +35,12 @@ jobs:
 
   deploy:
     name: deploy
-    needs: test
+    needs: [build, test]
     runs-on: ubuntu-latest
 
     steps:
       - name: My conditional step
-        if: github.event_name == 'pull_request' && github.event.action == 'unassigned'
-        run: echo This event is a pull request that had an assignee removed.
+        run: echo This event is ...
 
       - name: my first step
         if: failure()
