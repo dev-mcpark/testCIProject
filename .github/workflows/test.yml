@@ -38,8 +38,8 @@ jobs:
 
     steps:
       - name: My conditional step
-      if: github.event_name == 'pull_request' && github.event.action == 'unassigned'
-      run: echo This event is a pull request that had an assignee removed.
+        if: github.event_name == 'pull_request' && github.event.action == 'unassigned'
+        run: echo This event is a pull request that had an assignee removed.
 
 
     
