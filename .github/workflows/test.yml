@@ -3,12 +3,26 @@ name: test work flow
 on: 
   push:
     branches:
-      - featrue/*
+      - feature/*
       - develope/*
       - hotfix/*
       - release/*
 
 jobs:
+  create_commit:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Create issue using REST API
+      run: |
+        curl --request POST \
+        --url https://api.github.com/repos/${{ github.repository }}/issues \
+        --header 'authorization: Bearer ${{ secrets.GITHUB_TOKEN }}' \
+        --header 'content-type: application/json' \
+        --data '{
+          "title": "Automated issue for commit: ${{ github.sha }}", 
+          "body": "This issue was automatically created by the GitHub Action workflow **${{ github.workflow }}**. \n\n The commit hash was: _${{ github.sha }}_." 
+          }'
+
   build:
 
     runs-on: ubuntu-latest
@@ -16,7 +30,7 @@ jobs:
     steps:
     - uses: actions/checkout@v1
     - name: Run a one-line script
-      run: echo test work flow!
+      run: echo test work flow!  ${{ github.ref }}
     - name: Run a multi-line script
       run: |
         echo Add other actions to build,
@@ -29,8 +43,19 @@ jobs:
     steps:
     - name: print test
       env:
-        DJANGO_SETTINGS_MODULE: timespread.settings_local_test
+        DJANGO_SETTINGS_MODULE: ${{ secrets.TEST_DJANGO_SETTINGS_MODULE }}
       run: | 
         echo $DJANGO_SETTINGS_MODULE
+
+  deploy:
+    name: deploy
+    needs: test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: My conditional step
+        if: github.event_name == 'pull_request' && github.event.action == 'unassigned'
+        run: echo This event is a pull request that had an assignee removed.
+
 
     

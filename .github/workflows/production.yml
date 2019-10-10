@@ -18,3 +18,28 @@ jobs:
       run: |
         echo Add other actions to build,
         echo test, and deploy your project.
+
+  test:
+    name: code test
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+    - name: print test
+      env:
+        DJANGO_SETTINGS_MODULE: ${{ secrets.TEST_DJANGO_SETTINGS_MODULE }}
+      run: | 
+        echo $DJANGO_SETTINGS_MODULE
+
+  deploy:
+    name: deploy
+    needs: test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: My conditional step
+        if: github.event_name == 'pull_request' && github.event.action == 'unassigned'
+        run: echo This event is a pull request that had an assignee removed.
+
+      - name: my first step
+        if: failure()
+        run: echo Failed!
