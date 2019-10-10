@@ -30,7 +30,7 @@ jobs:
     steps:
     - uses: actions/checkout@v1
     - name: Run a one-line script
-      run: echo test work flow!  ${{ github.event.action }}
+      run: echo test work flow!  ${{ github.event_name }}
     - name: Run a multi-line script
       run: |
         echo Add other actions to build,
@@ -54,7 +54,7 @@ jobs:
 
     steps:
       - name: My conditional step
-        if: github.event_name == 'pull_request' && github.event.action == 'unassigned'
+        if: github.event_name == 'pull_request'
         run: echo This event is a pull request that had an assignee removed.
 
 
