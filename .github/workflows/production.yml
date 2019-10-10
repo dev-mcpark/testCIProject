@@ -1,6 +1,9 @@
-name: CI
+name: production Build and Deploy
 
-on: [push]
+on:
+  push:
+    branches:
+      - master
 
 jobs:
   build:

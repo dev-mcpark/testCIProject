@@ -3,7 +3,10 @@ name: test work flow
 on: 
   push:
     branches:
-      - master
+      - featrue/*
+      - develope/*
+      - hotfix/*
+      - release/*
 
 jobs:
   build:
