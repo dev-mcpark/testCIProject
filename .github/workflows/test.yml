@@ -24,6 +24,8 @@ jobs:
           }'
 
   build:
+    name: build
+    runs-on: ubuntu-latest
     container: docker://python:3.6
     steps:
     - uses: actions/checkout@v1
