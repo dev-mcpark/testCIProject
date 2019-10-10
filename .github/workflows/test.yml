@@ -24,10 +24,8 @@ jobs:
           }'
 
   build:
-
-    runs-on: ubuntu-latest
-    
     steps:
+    - uses: docker://python:3.6
     - uses: actions/checkout@v1
     - name: Run a one-line script
       run: echo test work flow!  ${{ github.event_name }}
