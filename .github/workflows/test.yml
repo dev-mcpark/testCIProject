@@ -30,16 +30,24 @@ jobs:
     steps:
     - uses: actions/checkout@v1
 
+    - name: install package
+      run: |
+        sudo apt-get -y update
+        sudo apt-get install default-libmysqlclient-dev python3-mysqldb \
+                      mysql-client python-pip python3-dev build-essential
+        sudo ln -s /usr/lib/x86_64-linux-gnu/libmysqlclient.so /usr/lib/libmysqlclient.so.18
+        curl -sL https://deb.nodesource.com/setup_10.x | sudo -E bash -
+        sudo apt-get install -y nodejs
+        sudo pip install --upgrade setuptools
+        sudo pip install awsebcli --upgrade
+        sudo pip install awscli --upgrade
+
     - name: install dependencies
       run: |
         python3 -m venv venv
         . venv/bin/activate
         pip install -r requirements.txt
 
-    - name: Run a multi-line script
-      run: |
-        echo Add other actions to build,
-        echo test, and deploy your project.
   
   test:
     name: code test
@@ -51,6 +59,7 @@ jobs:
         DJANGO_SETTINGS_MODULE: ${{ secrets.TEST_DJANGO_SETTINGS_MODULE }}
       run: | 
         echo $DJANGO_SETTINGS_MODULE
+        pytest
 
   deploy:
     name: deploy
