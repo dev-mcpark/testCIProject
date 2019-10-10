@@ -34,7 +34,7 @@ jobs:
       run: |
         apt-get -y update
         apt-get install default-libmysqlclient-dev python3-mysqldb \
-                      mysql-client python-pip python3-dev build-essential
+                      default-mysql-client python-pip python3-dev build-essential
         ln -s /usr/lib/x86_64-linux-gnu/libmysqlclient.so /usr/lib/libmysqlclient.so.18
         curl -sL https://deb.nodesource.com/setup_10.x | sudo -E bash -
         apt-get install -y nodejs
