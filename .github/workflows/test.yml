@@ -30,7 +30,7 @@ jobs:
     steps:
     - uses: actions/checkout@v1
     - name: Run a one-line script
-      run: echo test work flow!
+      run: echo test work flow!  ${{ github.ref }}
     - name: Run a multi-line script
       run: |
         echo Add other actions to build,
@@ -43,7 +43,7 @@ jobs:
     steps:
     - name: print test
       env:
-        DJANGO_SETTINGS_MODULE: timespread.settings_local_test
+        DJANGO_SETTINGS_MODULE: ${{ secrets.TEST_DJANGO_SETTINGS_MODULE }}
       run: | 
         echo $DJANGO_SETTINGS_MODULE
 
