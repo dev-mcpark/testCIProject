@@ -21,3 +21,16 @@ jobs:
       run: |
         echo Add other actions to build,
         echo test, and deploy your project.
+  
+  test:
+    name: code test
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+    - name: print test
+      env:
+        DJANGO_SETTINGS_MODULE: timespread.settings_local_test
+      run: | 
+        echo $DJANGO_SETTINGS_MODULE
+
+    
