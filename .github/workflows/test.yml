@@ -52,11 +52,7 @@ jobs:
         apt-get install -y default-libmysqlclient-dev python3-mysqldb \
                       default-mysql-client python-pip python3-dev build-essential
         ln -s /usr/lib/x86_64-linux-gnu/libmysqlclient.so /usr/lib/libmysqlclient.so.18
-        curl -sL https://deb.nodesource.com/setup_10.x | sudo -E bash -
-        apt-get install -y nodejs
         pip install --upgrade setuptools
-        pip install awsebcli --upgrade
-        pip install awscli --upgrade
         
     - name: install dependencies
       run: |
@@ -75,9 +71,18 @@ jobs:
     name: deploy
     needs: [build, test]
     runs-on: ubuntu-latest
+    container: docker://python:3.6
     steps:
-      - name: My conditional step
-        run: echo This event is a pull request that had an assignee removed.
+    - name: install package
+      run: |
+        apt-get -y update
+        curl -sL https://deb.nodesource.com/setup_10.x | sudo -E bash -
+        apt-get install -y nodejs
+        pip install awsebcli --upgrade
+        pip install awscli --upgrade
+
+    - name: My conditional step
+      run: echo This event is a pull request that had an assignee removed.
 
 
     
