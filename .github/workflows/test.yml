@@ -1,12 +1,13 @@
 name: test work flow
 
-on: [push, repository_dispatch]
+on:
   push:
     branches:
       - feature/*
       - develope/*
       - hotfix/*
       - release/*
+  repository_dispatch:
 
 jobs:
   SlackNotification:
