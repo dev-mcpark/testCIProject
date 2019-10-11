@@ -15,7 +15,7 @@ jobs:
     - name: Create slack message using incoming hook
       run: |
         curl --request POST \
-        --url https://hooks.slack.com/services/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 \
+        --url https://hooks.slack.com/services/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 \
         --header 'content-type: application/json' \
         --data '{
           "channel": "#git_timespread",
