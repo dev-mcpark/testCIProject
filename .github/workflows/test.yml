@@ -9,9 +9,9 @@ on:
       - release/*
 
 jobs:
-  slackNotification:
+  SlackNotification:
     name: Slack Notification
-    needs: [deploy]
+    needs: [Deploy]
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@master
@@ -25,22 +25,8 @@ jobs:
         SLACK_USERNAME: github
 
 
-  build:
-    name: build
-    runs-on: ubuntu-latest
-    container: docker://python:3.6
-    steps:
-    - uses: actions/checkout@v1  # 코드 가져오기
-    
-    - name: install dependencies
-      run: |
-        python3 -m venv venv
-        . venv/bin/activate
-        pip install -r requirements.txt
-  
-  test:
-    name: test
-    needs: [build]
+  BuildAndTest:
+    name: builid and test
     runs-on: ubuntu-latest
     container: docker://python:3.6
     steps:
@@ -69,16 +55,16 @@ jobs:
         . venv/bin/activate
         pytest
 
-  deploy:
+  Deploy:
     name: deploy
-    needs: [build, test]
+    needs: [BuildAndTest]
     runs-on: ubuntu-latest
     container: docker://python:3.6
     steps:
     - name: install package
       run: |
         apt-get -y update
-        curl -sL https://deb.nodesource.com/setup_10.x | sudo -E bash -
+        curl -sL https://deb.nodesource.com/setup_10.x | -E bash -
         apt-get install -y nodejs
         pip install awsebcli --upgrade
         pip install awscli --upgrade
