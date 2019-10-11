@@ -15,7 +15,7 @@ jobs:
     - name: Create slack message using incoming hook
       run: |
         curl --request POST \
-        --url https://hooks.slack.com/services/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 \
+        --url https://hooks.slack.com/services/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 \
         --header 'content-type: application/json' \
         --data '{
           "channel": "#git_timespread",
@@ -57,7 +57,7 @@ jobs:
     runs-on: ubuntu-latest
     container: docker://python:3.6
     steps:
-    
+
     - name: install dependencies
       run: |
         python3 -m venv venv
