@@ -1,7 +1,7 @@
 name: test work flow
 
 on: 
-  push:
+  push|repository_dispatch:
     branches:
       - feature/*
       - develope/*
@@ -55,9 +55,15 @@ jobs:
         . venv/bin/activate
         pytest
 
+  Approval:
+    name: deploy approval
+    if: github.event_name == 'repository_dispatch'
+    run: 
+      echo test
+
   Deploy:
     name: deploy
-    needs: [BuildAndTest]
+    needs: [BuildAndTest, Approval]
     runs-on: ubuntu-latest
     container: docker://python:3.6
     steps:
