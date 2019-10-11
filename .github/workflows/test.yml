@@ -1,7 +1,7 @@
 name: test work flow
 
-on: 
-  push|repository_dispatch:
+on: [push, repository_dispatch]
+  push:
     branches:
       - feature/*
       - develope/*
