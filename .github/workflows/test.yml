@@ -9,19 +9,18 @@ on:
       - release/*
 
 jobs:
-  slack_message:
+  create_commit:
     runs-on: ubuntu-latest
     steps:
-    - name: Create slack message using incoming hook
+    - name: Create issue using REST API
       run: |
         curl --request POST \
-        --url https://hooks.slack.com/services/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 \
+        --url https://api.github.com/repos/${{ github.repository }}/issues \
+        --header 'authorization: Bearer ${{ secrets.GITHUB_TOKEN }}' \
         --header 'content-type: application/json' \
         --data '{
-          "channel": "#git_timespread",
-          "username": "github action",
-          "text": "github action work flow 중 slack incoming hook 메세지 보내기",
-          "icon_emoji": ":ghost:"
+          "title": "Automated issue for commit: ${{ github.sha }}", 
+          "body": "This issue was automatically created by the GitHub Action workflow **${{ github.workflow }}**. \n\n The commit hash was: _${{ github.sha }}_." 
           }'
 
   build:
@@ -29,8 +28,7 @@ jobs:
     runs-on: ubuntu-latest
     container: docker://python:3.6
     steps:
-    - uses: docker://python:3.6
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v1  # 코드 가져오기
 
     # - name: install package
     #   run: |
@@ -57,7 +55,7 @@ jobs:
     runs-on: ubuntu-latest
     container: docker://python:3.6
     steps:
-
+    - uses: actions/checkout@v1
     - name: install dependencies
       run: |
         python3 -m venv venv
