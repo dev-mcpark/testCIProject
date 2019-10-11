@@ -9,19 +9,20 @@ on:
       - release/*
 
 jobs:
-  create_commit:
+  slackNotification:
+    name: Slack Notification
     runs-on: ubuntu-latest
     steps:
-    - name: Create issue using REST API
-      run: |
-        curl --request POST \
-        --url https://api.github.com/repos/${{ github.repository }}/issues \
-        --header 'authorization: Bearer ${{ secrets.GITHUB_TOKEN }}' \
-        --header 'content-type: application/json' \
-        --data '{
-          "title": "Automated issue for commit: ${{ github.sha }}", 
-          "body": "This issue was automatically created by the GitHub Action workflow **${{ github.workflow }}**. \n\n The commit hash was: _${{ github.sha }}_." 
-          }'
+    - uses: actions/checkout@master
+    - name: Slack Notification
+      uses: rtCamp/action-slack-notify@master
+      env:
+        SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+        SLACK_CHANNEL: git_timespread
+        SLACK_ICON: https://github.com/rtCamp.png?size=48
+        SLACK_MESSAGE: 'Post Content :rocket:'
+        SLACK_TITLE: Post Title
+        SLACK_USERNAME: rtCamp
 
   build:
     name: build
@@ -67,7 +68,6 @@ jobs:
         DJANGO_SETTINGS_MODULE: ${{ secrets.TEST_DJANGO_SETTINGS_MODULE }}
       run: | 
         echo $DJANGO_SETTINGS_MODULE
-        pytest
 
   deploy:
     name: deploy
