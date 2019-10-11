@@ -53,6 +53,7 @@ jobs:
                       default-mysql-client python-pip python3-dev build-essential
         ln -s /usr/lib/x86_64-linux-gnu/libmysqlclient.so /usr/lib/libmysqlclient.so.18
         pip install --upgrade setuptools
+        pip install --upgrade pip
         
     - name: install dependencies
       run: |
@@ -65,7 +66,7 @@ jobs:
         DJANGO_SETTINGS_MODULE: ${{ secrets.TEST_DJANGO_SETTINGS_MODULE }}
       run: | 
         echo $DJANGO_SETTINGS_MODULE
-        pytest
+        python -m pytest -s -v 
 
   deploy:
     name: deploy
