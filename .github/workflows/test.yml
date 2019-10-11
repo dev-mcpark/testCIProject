@@ -1,7 +1,7 @@
 name: test work flow
 
 on: 
-  push:
+  pull_request:
     branches:
       - feature/*
       - develope/*
@@ -23,8 +23,21 @@ jobs:
         SLACK_TITLE: Post Title
         SLACK_USERNAME: rtCamp
 
+  labelWhenApproved:
+    name: Label when approved
+    runs-on: ubuntu-latest
+    steps:
+    - name: Label when approved
+      uses: pullreminders/label-when-approved-action@master
+      env:
+        APPROVALS: "1"
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        ADD_LABEL: "approved"
+        REMOVE_LABEL: "awaiting review"
+
   build:
     name: build
+    needs: labelWhenApproved
     runs-on: ubuntu-latest
     container: docker://python:3.6
     steps:
@@ -51,7 +64,7 @@ jobs:
   
   test:
     name: code test
-    needs: build
+    needs: [build, labelWhenApproved]
     runs-on: ubuntu-latest
     container: docker://python:3.6
     steps:
