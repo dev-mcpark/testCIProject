@@ -7,13 +7,18 @@ on:
 
 jobs:
   build:
-
+    name: build
     runs-on: ubuntu-latest
-    
     steps:
+    - uses: docker://python:3.6
     - uses: actions/checkout@v1
-    - name: Run a one-line script
-      run: echo Hello, world! ${{ github.event_name }}
+
+    - name: install dependencies
+      run: |
+        python3 -m venv venv
+        . venv/bin/activate
+        pip install -r requirements.txt
+
     - name: Run a multi-line script
       run: |
         echo Add other actions to build,
@@ -32,13 +37,12 @@ jobs:
 
   deploy:
     name: deploy
-    needs: test
+    needs: [build, test]
     runs-on: ubuntu-latest
 
     steps:
       - name: My conditional step
-        if: github.event_name == 'pull_request'
-        run: echo This event is a pull request that had an assignee removed.
+        run: echo This event is ...
 
       - name: my first step
         if: failure()

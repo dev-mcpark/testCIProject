@@ -1,7 +1,7 @@
 name: test work flow
 
 on: 
-  push:
+  pull_request:
     branches:
       - feature/*
       - develope/*
@@ -9,39 +9,73 @@ on:
       - release/*
 
 jobs:
-  create_commit:
+  slackNotification:
+    name: Slack Notification
     runs-on: ubuntu-latest
     steps:
-    - name: Create issue using REST API
-      run: |
-        curl --request POST \
-        --url https://api.github.com/repos/${{ github.repository }}/issues \
-        --header 'authorization: Bearer ${{ secrets.GITHUB_TOKEN }}' \
-        --header 'content-type: application/json' \
-        --data '{
-          "title": "Automated issue for commit: ${{ github.sha }}", 
-          "body": "This issue was automatically created by the GitHub Action workflow **${{ github.workflow }}**. \n\n The commit hash was: _${{ github.sha }}_." 
-          }'
+    - uses: actions/checkout@master
+    - name: Slack Notification
+      uses: rtCamp/action-slack-notify@master
+      env:
+        SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+        SLACK_CHANNEL: git_timespread
+        SLACK_MESSAGE: 'Post Content :rocket:'
+        SLACK_TITLE: Post Title
+        SLACK_USERNAME: rtCamp
+
+  labelWhenApproved:
+    name: Label when approved
+    runs-on: ubuntu-latest
+    steps:
+    - name: Label when approved
+      uses: pullreminders/label-when-approved-action@master
+      env:
+        APPROVALS: "1"
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        ADD_LABEL: "approved"
+        REMOVE_LABEL: "awaiting review"
 
   build:
-
+    name: build
+    needs: labelWhenApproved
     runs-on: ubuntu-latest
-    
+    container: docker://python:3.6
     steps:
-    - uses: actions/checkout@v1
-    - name: Run a one-line script
-      run: echo test work flow!  ${{ github.event_name }}
-    - name: Run a multi-line script
+    - uses: actions/checkout@v1  # 코드 가져오기
+
+    # - name: install package
+    #   run: |
+    #     apt-get -y update
+    #     apt-get install default-libmysqlclient-dev python3-mysqldb \
+    #                   default-mysql-client python-pip python3-dev build-essential
+    #     ln -s /usr/lib/x86_64-linux-gnu/libmysqlclient.so /usr/lib/libmysqlclient.so.18
+    #     curl -sL https://deb.nodesource.com/setup_10.x | sudo -E bash -
+    #     apt-get install -y nodejs
+    #     pip install --upgrade setuptools
+    #     pip install awsebcli --upgrade
+    #     pip install awscli --upgrade
+
+    - name: install dependencies
       run: |
-        echo Add other actions to build,
-        echo test, and deploy your project.
+        python3 -m venv venv
+        . venv/bin/activate
+        pip install -r requirements.txt
+
   
   test:
     name: code test
-    needs: build
+    needs: [build, labelWhenApproved]
     runs-on: ubuntu-latest
+    container: docker://python:3.6
     steps:
-    - name: print test
+    - uses: actions/checkout@v1
+    - name: install dependencies
+      run: |
+        python3 -m venv venv
+        . venv/bin/activate
+        pip install -r requirements.txt
+
+    - name: pytest
       env:
         DJANGO_SETTINGS_MODULE: ${{ secrets.TEST_DJANGO_SETTINGS_MODULE }}
       run: | 
@@ -49,12 +83,10 @@ jobs:
 
   deploy:
     name: deploy
-    needs: test
+    needs: [build, test]
     runs-on: ubuntu-latest
-
     steps:
       - name: My conditional step
-        if: github.event_name == 'pull_request'
         run: echo This event is a pull request that had an assignee removed.
 
 
