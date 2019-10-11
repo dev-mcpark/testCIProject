@@ -64,7 +64,7 @@ jobs:
     - name: install package
       run: |
         apt-get -y update
-        curl -sL https://deb.nodesource.com/setup_10.x | -E bash -
+        curl -sL https://deb.nodesource.com/setup_10.x | bash -
         apt-get install -y nodejs
         pip install awsebcli --upgrade
         pip install awscli --upgrade
