@@ -9,20 +9,20 @@ on:
       - release/*
 
 jobs:
-  SlackNotification:
-    name: Slack Notification
-    needs: [Deploy]
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@master
-    - name: Slack Notification
-      uses: rtCamp/action-slack-notify@master
-      env:
-        SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
-        SLACK_CHANNEL: git_timespread
-        SLACK_MESSAGE: 'Post Content :rocket:'
-        SLACK_TITLE: Post Title
-        SLACK_USERNAME: github
+  # SlackNotification:
+  #   name: Slack Notification
+  #   needs: [Deploy]
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #   - uses: actions/checkout@master
+  #   - name: Slack Notification
+  #     uses: rtCamp/action-slack-notify@master
+  #     env:
+  #       SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+  #       SLACK_CHANNEL: git_timespread
+  #       SLACK_MESSAGE: 'Post Content :rocket:'
+  #       SLACK_TITLE: Post Title
+  #       SLACK_USERNAME: github
 
 
   BuildAndTest:
@@ -56,22 +56,22 @@ jobs:
         pytest
 
 
-  Deploy:
-    name: deploy
-    needs: [BuildAndTest]
-    runs-on: ubuntu-latest
-    container: docker://python:3.6
-    steps:
-    - name: install package
-      run: |
-        apt-get -y update
-        curl -sL https://deb.nodesource.com/setup_10.x | bash -
-        apt-get install -y nodejs
-        pip install awsebcli --upgrade
-        pip install awscli --upgrade
+  # Deploy:
+  #   name: deploy
+  #   needs: [BuildAndTest]
+  #   runs-on: ubuntu-latest
+  #   container: docker://python:3.6
+  #   steps:
+  #   - name: install package
+  #     run: |
+  #       apt-get -y update
+  #       curl -sL https://deb.nodesource.com/setup_10.x | bash -
+  #       apt-get install -y nodejs
+  #       pip install awsebcli --upgrade
+  #       pip install awscli --upgrade
 
-    - name: My conditional step
-      run: echo This event is a pull request that had an assignee removed.
+  #   - name: My conditional step
+  #     run: echo This event is a pull request that had an assignee removed.
 
 
     
