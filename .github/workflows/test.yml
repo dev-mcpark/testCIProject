@@ -7,7 +7,6 @@ on:
       - develope/*
       - hotfix/*
       - release/*
-  repository_dispatch:
 
 jobs:
   SlackNotification:
@@ -56,15 +55,10 @@ jobs:
         . venv/bin/activate
         pytest
 
-  Approval:
-    name: deploy approval
-    if: github.event_name == 'repository_dispatch'
-    run: 
-      echo test
 
   Deploy:
     name: deploy
-    needs: [BuildAndTest, Approval]
+    needs: [BuildAndTest]
     runs-on: ubuntu-latest
     container: docker://python:3.6
     steps:
