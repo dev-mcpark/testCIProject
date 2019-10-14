@@ -1,7 +1,7 @@
 name: test work flow
 
-on: 
-  pull_request:
+on:
+  push:
     branches:
       - feature/*
       - develope/*
@@ -9,70 +9,42 @@ on:
       - release/*
 
 jobs:
-  slackNotification:
-    name: Slack Notification
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@master
-    - name: Slack Notification
-      uses: rtCamp/action-slack-notify@master
-      env:
-        SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
-        SLACK_CHANNEL: git_timespread
-        SLACK_MESSAGE: 'Post Content :rocket:'
-        SLACK_TITLE: Post Title
-        SLACK_USERNAME: rtCamp
+  # SlackNotification:
+  #   name: Slack Notification
+  #   needs: [Deploy]
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #   - uses: actions/checkout@master
+  #   - name: Slack Notification
+  #     uses: rtCamp/action-slack-notify@master
+  #     env:
+  #       SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+  #       SLACK_CHANNEL: git_timespread
+  #       SLACK_MESSAGE: 'Post Content :rocket:'
+  #       SLACK_TITLE: Post Title
+  #       SLACK_USERNAME: github
 
-  labelWhenApproved:
-    name: Label when approved
-    runs-on: ubuntu-latest
-    steps:
-    - name: Label when approved
-      uses: pullreminders/label-when-approved-action@master
-      env:
-        APPROVALS: "1"
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        ADD_LABEL: "approved"
-        REMOVE_LABEL: "awaiting review"
 
-  build:
-    name: build
-    needs: labelWhenApproved
+  BuildAndTest:
+    name: builid and test
     runs-on: ubuntu-latest
     container: docker://python:3.6
     steps:
     - uses: actions/checkout@v1  # 코드 가져오기
 
-    # - name: install package
-    #   run: |
-    #     apt-get -y update
-    #     apt-get install default-libmysqlclient-dev python3-mysqldb \
-    #                   default-mysql-client python-pip python3-dev build-essential
-    #     ln -s /usr/lib/x86_64-linux-gnu/libmysqlclient.so /usr/lib/libmysqlclient.so.18
-    #     curl -sL https://deb.nodesource.com/setup_10.x | sudo -E bash -
-    #     apt-get install -y nodejs
-    #     pip install --upgrade setuptools
-    #     pip install awsebcli --upgrade
-    #     pip install awscli --upgrade
+    - name: install package
+      run: |
+        apt-get -y update
+        apt-get install -y default-libmysqlclient-dev python3-mysqldb \
+                      default-mysql-client python-pip python3-dev build-essential
+        ln -s /usr/lib/x86_64-linux-gnu/libmysqlclient.so /usr/lib/libmysqlclient.so.18
 
     - name: install dependencies
       run: |
         python3 -m venv venv
         . venv/bin/activate
-        pip install -r requirements.txt
-
-  
-  test:
-    name: code test
-    needs: [build, labelWhenApproved]
-    runs-on: ubuntu-latest
-    container: docker://python:3.6
-    steps:
-    - uses: actions/checkout@v1
-    - name: install dependencies
-      run: |
-        python3 -m venv venv
-        . venv/bin/activate
+        pip install --upgrade setuptools
+        pip install --upgrade pip
         pip install -r requirements.txt
 
     - name: pytest
@@ -80,14 +52,26 @@ jobs:
         DJANGO_SETTINGS_MODULE: ${{ secrets.TEST_DJANGO_SETTINGS_MODULE }}
       run: | 
         echo $DJANGO_SETTINGS_MODULE
+        . venv/bin/activate
+        pytest
 
-  deploy:
-    name: deploy
-    needs: [build, test]
-    runs-on: ubuntu-latest
-    steps:
-      - name: My conditional step
-        run: echo This event is a pull request that had an assignee removed.
+
+  # Deploy:
+  #   name: deploy
+  #   needs: [BuildAndTest]
+  #   runs-on: ubuntu-latest
+  #   container: docker://python:3.6
+  #   steps:
+  #   - name: install package
+  #     run: |
+  #       apt-get -y update
+  #       curl -sL https://deb.nodesource.com/setup_10.x | bash -
+  #       apt-get install -y nodejs
+  #       pip install awsebcli --upgrade
+  #       pip install awscli --upgrade
+
+  #   - name: My conditional step
+  #     run: echo This event is a pull request that had an assignee removed.
 
 
     
